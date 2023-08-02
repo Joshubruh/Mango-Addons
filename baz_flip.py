@@ -1,5 +1,5 @@
 #--------------- IMPORTS / BOILERPLATE
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 import pytesseract
 import time
 import numpy as np
@@ -8,12 +8,19 @@ from pynput.keyboard import Key, Controller
 import pyautogui as pag
 import coordinates
 import log
+import tkinter as tk
 
 startTime = 0
 endTime = 0
 
 keyboard = Controller()
 #--------------- USER INTERFACE 
+
+def main_gui():
+    window = tk.Tk(width=400, height=500)
+    windowTitle = tk.Label(text="MangoAddons - Joshubruh")
+    windowTitle.pack()
+    window.mainloop()
 
 def main():
     print('''
@@ -75,6 +82,15 @@ def read_chat(): # Grabs section of chat history and converts to text
     chatGrabImg = ImageGrab.grab(bbox=(0,1140,950,1340))
     chatGrab = pytesseract.image_to_string(chatGrabImg)
     return chatGrab
+
+def determine_gui_open(called_from):
+    img = ImageGrab.grab()
+    color = img.getpixel((1430, 420))
+    if color == (198, 198, 215):
+        time.sleep(0.3)
+        keyboard.press(Key.esc)
+        time.sleep(0.1)
+        keyboard.release(Key.esc)
 
 def execute(arg, needsDelay):
     if needsDelay:
@@ -449,6 +465,7 @@ def handle_outdated_ms1_sell():
 # Start Serum Module
 
 def sell_offer_serum(firstexec):
+    determine_gui_open("NULL")
     if firstexec == True:
         open_bazaar()
     else:
@@ -467,6 +484,7 @@ def sell_offer_serum(firstexec):
         time.sleep(1)
 
 def create_buy_order_serum(firstexec):
+    determine_gui_open("NULL")
     log.start()
     if firstexec == False:
         bz_wo_slash()
@@ -540,7 +558,4 @@ def handle_outdated_ms1_sell():
     time.sleep(1)
     sell_offer_serum(False)
 
-# DEBUG - Used to run each function individually, as to detect issues
-
-if __name__ == '__main__':
-    main()
+main_gui()
