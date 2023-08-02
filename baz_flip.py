@@ -7,27 +7,117 @@ import os
 from pynput.keyboard import Key, Controller
 import pyautogui as pag
 import coordinates
+import log
 
+startTime = 0
+endTime = 0
 
 keyboard = Controller()
+#--------------- USER INTERFACE 
+
+def main():
+    print('''
+88,dPYba,,adPYba,  ,adPPYYba, 8b,dPPYba,   ,adPPYb,d8  ,adPPYba,   
+88P'   "88"    "8a ""     `Y8 88P'   `"8a a8"    `Y88 a8"     "8a  
+88      88      88 ,adPPPPP88 88       88 8b       88 8b       d8  
+88      88      88 88,    ,88 88       88 "8a,   ,d88 "8a,   ,a8"  
+88      88      88 `"8bbdP"Y8 88       88  `"YbbdP"Y8  `"YbbdP"'   
+                                           aa,    ,88              
+                                            "Y8bbdP"          ''')
+    print("----------------------------")
+    print("MangoAddons, Bazaar Flipper Module")
+    print("Programmed by @joshubruh")
+    print("----------------------------")
+    get_action()
+
+def get_action():
+    print("Enter your desired module: [Master Star, Kismet, Serum]: ")
+    module = input("> ")
+
+    print("Now, enter if you want to start with a SELL, or a BUY (if you already have an item, run SELL) [sell/buy]")
+    action = input("> ")
+
+    if module == "Master Star":
+        if action == "sell":
+            print("MS1 Sell - Starting in 5 Seconds")
+            time.sleep(5)
+            sell_offer_ms1(True)
+        if action == "buy":
+            print("MS1 Buy - Starting in 5 Seconds")
+            time.sleep(5)
+            create_buy_order_ms1(True)
+        else:
+            print("UH-OH! Action Invalid! Please re-enter your action")
+            get_action()
+
+    elif module == "Kismet":
+        print("UH-OH! The Kismet module has been discontinued! Please run a different module")
+        get_action()
+
+    if module == "Serum":
+        if action == "sell":
+            print("Serum Sell - Starting in 5 Seconds")
+            time.sleep(5)
+            sell_offer_serum(True)
+        if action == "buy":
+            print("Serum Buy - Starting in 5 Seconds")
+            time.sleep(5)
+            create_buy_order_serum(True)
+        else:
+            print("UH-OH! Action Invalid! Please re-enter your action")
+            get_action()
+
+
+
+
 #--------------- GLOBAL COMMANDS
 def read_chat(): # Grabs section of chat history and converts to text
     chatGrabImg = ImageGrab.grab(bbox=(0,1140,950,1340))
     chatGrab = pytesseract.image_to_string(chatGrabImg)
     return chatGrab
 
+def execute(arg, needsDelay):
+    if needsDelay:
+        time.sleep(10)
+    for char in arg:
+        keyboard.press(char)
+        time.sleep(0.35)
+        keyboard.release(char)
+    keyboard.press(Key.enter)
+    keyboard.release(Key.enter)
+
+def reconnect(trigger):
+    print("[LOG]: Disconnect Detected")
+    os.system("espeak disconnect_detected")
+    time.sleep(5)
+    pag.click(1275,790)
+    pag.moveTo(890,315)
+    time.sleep(0.3)
+    pag.click()
+
+    execute("/play skyblock", True)
+    time.sleep(10)
+
+    if trigger == "buy": # Switch all instances of ms1 for whatever you are currently flippinh
+        cancel_order(True)
+        create_buy_order_serum(False)
+    elif trigger == "sell":
+        cancel_sell(True)
+        sell_offer_serum(False)
+
+
+
+def determine_connected(trigger):
+    chatGrabImg = ImageGrab.grab(bbox=(1112,768,1437,816))
+    chatGrab = pytesseract.image_to_string(chatGrabImg)
+    if "Back" in chatGrab and "list" in chatGrab:
+        reconnect(trigger)
+
 def warpout_failsafe(called_from):
+    print("[LOG]: Warpout Detected")
     os.system("espeak executing_warpout_protocol")
-    time.sleep(60)
-    time.sleep(0.1)
-    keyboard.press("i")
-    time.sleep(0.1)
-    keyboard.release("i")
-    time.sleep(0.1)
-    keyboard.press("s")
-    time.sleep(0.1)
-    keyboard.release("s")
-    time.sleep(0.1)
+    time.sleep(65)
+    execute("/play skyblock")
     keyboard.press(Key.enter)
     keyboard.release(Key.enter)
 
@@ -101,12 +191,16 @@ def cancel_sell(slash):
     time.sleep(1)
     pag.moveTo(1115, 580, duration=0.1)
     pag.click()
+    time.sleep(1)
     pag.moveTo(1280, 580, duration=0.1)
     pag.click()
     time.sleep(1)
     keyboard.press(Key.esc)
     keyboard.release(Key.esc)
-
+    time.sleep(0.5)
+    keyboard.press("/")
+    keyboard.release("/")
+    time.sleep(0.1)
 def cancel_order(slash):
     if slash:
         open_bazaar()
@@ -122,14 +216,15 @@ def cancel_order(slash):
     time.sleep(1)
     pag.moveTo(1170, 565, duration=0.1)
     pag.click()
-    time.sleep(0.35)
+    time.sleep(1)
 
     keyboard.press(Key.esc)
+    time.sleep(0.1)
     keyboard.release(Key.esc)
     time.sleep(0.5)
     keyboard.press("/")
     keyboard.release("/")
-    time.sleep(0.1)
+    time.sleep(0.5)
 
 #--------------- START KISMET SUB-MOD
 def main_kismet():
@@ -260,8 +355,11 @@ def handle_outdated_sell_kismet():
     time.sleep(1)
     sell_offer_kismets()
 #--------------- START OF MS1 SUB-MOD
-def sell_offer_ms1():
-    bz_wo_slash()
+def sell_offer_ms1(firstexec):
+    if firstexec == True:
+        open_bazaar()
+    else:
+        bz_wo_slash()
     time.sleep(0.3)
     coordinates.click(coordinates.oddities_cat)
     coordinates.click(coordinates.modifiers_menu)
@@ -276,7 +374,7 @@ def sell_offer_ms1():
         time.sleep(1)
 
 def create_buy_order_ms1(firstexec):
-
+    log.start()
     if firstexec == False:
         bz_wo_slash()
     else:
@@ -305,6 +403,8 @@ def detect_outdated_ms1_sell():
         handle_filled_ms1_sell()
     elif "restart" in read_chat():
         warpout_failsafe("ms1_sell")
+    elif len(read_chat()) < 5:
+        determine_connected("sell")
     else:
         pass
 
@@ -316,51 +416,131 @@ def detect_outdated_ms1_buy():
         handle_filled_ms1_buy()
     elif "restart" in read_chat():
         warpout_failsafe("ms1_buy")
-    else:
-        pass
+    elif len(read_chat()) < 5:
+        determine_connected("buy")
 
 def handle_filled_ms1_sell():
-    print("Cycle Completed!")
+    print("[LOG]: MS1 Sell Filled In: "+str(round(log.end()))+" Seconds!")
     claim_sell(False)
     time.sleep(0.5)
     create_buy_order_ms1(False)
 
 def handle_filled_ms1_buy():
-    print("\a")
+    print("[LOG]: MS1 Buy Filled")
     claim_order(False)
-    time.sleep(0.5)
-    sell_offer_ms1()
+    time.sleep(1)
+    sell_offer_ms1(False)
     
 def handle_outdated_ms1_buy():
+    print("[LOG]: MS1 Buy Outdated")
     print("\a")
     cancel_order(False)
-    time.sleep(0.5)
+    time.sleep(1)
     create_buy_order_ms1(False)
 
 def handle_outdated_ms1_sell():
+    print("[LOG]: MS1 Sell Outdated")
     print("\a")
     time.sleep(0.7)
     cancel_sell(False)
+    time.sleep(1)
+    sell_offer_ms1(False)
+
+# Start Serum Module
+
+def sell_offer_serum(firstexec):
+    if firstexec == True:
+        open_bazaar()
+    else:
+        bz_wo_slash()
+    time.sleep(0.3)
+    coordinates.click(coordinates.oddities_cat)
+    coordinates.click(coordinates.modifiers_menu)
+    coordinates.click(coordinates.serum)
+    coordinates.click(coordinates.create_sell_order)
+    coordinates.click(coordinates.undercut_by_1)
+    coordinates.click(coordinates.confirm_offer)
     keyboard.press("/")
     keyboard.release("/")
-    time.sleep(0.5)
-    sell_offer_ms1()
+    while True:
+        detect_outdated_ms1_sell()
+        time.sleep(1)
 
+def create_buy_order_serum(firstexec):
+    log.start()
+    if firstexec == False:
+        bz_wo_slash()
+    else:
+        open_bazaar()
+
+    time.sleep(0.5)
+    coordinates.click(coordinates.oddities_cat)
+    coordinates.click(coordinates.modifiers_menu)
+    coordinates.click(coordinates.serum)
+    coordinates.click(coordinates.create_buy_order)
+    coordinates.click(coordinates.buy_order_lowest_preset)
+    coordinates.click(coordinates.undercut_by_1)
+    coordinates.click(coordinates.confirm_offer)
+    keyboard.press("/")
+    keyboard.release("/")
+    while True:
+        detect_outdated_ms1_buy()
+        time.sleep(1)
+
+def detect_outdated_ms1_sell():
+    read_chat()
+    if "MATCHED" in read_chat() or "OUT" in read_chat() or "ATED" in read_chat():
+        print("Outdated: Relisting Order")
+        handle_outdated_ms1_sell()
+    elif "filled" in read_chat():
+        handle_filled_ms1_sell()
+    elif "restart" in read_chat():
+        warpout_failsafe("serum_sell")
+    elif len(read_chat()) < 5:
+        determine_connected("sell")
+    else:
+        pass
+
+def detect_outdated_ms1_buy():
+    if "MATCHED" in read_chat() or "OUT" in read_chat() or "ATED" in read_chat():
+        print("Outdated: Relisting Order")
+        handle_outdated_ms1_buy()
+    elif "filled" in read_chat():
+        handle_filled_ms1_buy()
+    elif "restart" in read_chat():
+        warpout_failsafe("serum_buy")
+    elif len(read_chat()) < 5:
+        determine_connected("buy")
+
+def handle_filled_ms1_sell():
+    print("[LOG]: Serum Sell Filled In: "+str(round(log.end()))+" Seconds!")
+    claim_sell(False)
+    time.sleep(0.5)
+    create_buy_order_serum(False)
+
+def handle_filled_ms1_buy():
+    print("[LOG]: Serum Buy Filled")
+    print("\a")
+    claim_order(False)
+    time.sleep(1)
+    sell_offer_serum(False)
+    
+def handle_outdated_ms1_buy():
+    print("[LOG]: Serum Buy Outdated")
+    print("\a")
+    cancel_order(False)
+    time.sleep(1)
+    create_buy_order_serum(False)
+
+def handle_outdated_ms1_sell():
+    print("[LOG]: Serum Sell Outdated")
+    print("\a")
+    time.sleep(0.7)
+    cancel_sell(False)
+    time.sleep(1)
+    sell_offer_serum(False)
 
 # DEBUG - Used to run each function individually, as to detect issues
 
-time.sleep(3)
-#outdated_handler()
-#read_chat()
-#main_kismet()
-#time.sleep(3)
-#cancel_sell()
-#time.sleep(3)
-#print(claim_order())
-create_buy_order_ms1(True)
-#sell_offer_ms1()
-#cancel_sell(False)
-#create_buy_order_ms1()
-#coordinates.debugmouse()
-#handle_filled_ms1_buy()
-#sell_offer_ms1()
+if __name__ == '__main__':
+    main()

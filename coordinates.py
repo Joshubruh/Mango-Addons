@@ -52,7 +52,7 @@ first_sell_offer = order_menu["r2y"] + " " + baz["c2x"]
 
 modifiers_menu = baz["r3y"] + " " + baz["c8x"]
 first_ms = submenu["r3y"] + " " + baz["c2x"]
-
+serum = submenu["r3y"] + " " + baz["c7x"]
 
 def debugmouse():
     pag.displayMousePosition()
