@@ -8,19 +8,12 @@ from pynput.keyboard import Key, Controller
 import pyautogui as pag
 import coordinates
 import log
-import tkinter as tk
 
 startTime = 0
 endTime = 0
 
 keyboard = Controller()
 #--------------- USER INTERFACE 
-
-def main_gui():
-    window = tk.Tk(width=400, height=500)
-    windowTitle = tk.Label(text="MangoAddons - Joshubruh")
-    windowTitle.pack()
-    window.mainloop()
 
 def main():
     print('''
@@ -558,4 +551,5 @@ def handle_outdated_ms1_sell():
     time.sleep(1)
     sell_offer_serum(False)
 
-main_gui()
+if __name__ == '__main__':
+    main()
