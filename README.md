@@ -1,6 +1,6 @@
 # MangoAddons
 
-This is a project developed by me and Haquire to aid in grinding skyblock coins whilst AFK
+This is a project developed by @joshubruh to aid in grinding skyblock coins whilst AFK
 
 # The modules we currently include
 
@@ -8,12 +8,8 @@ Clay -> NPC flipper
 
 Bazaar Flipper [Pre-Progrmmed with Kismets and First Master Stars]
 
-Discord Bot [To control the mod remotely]
-
 # How to Use
 
-First, make a discord bot, this can be done at https://discord.com/developers/applications.  Follow your prefered guide to get the bot in to your server.  
+First, install dependencies.  For windows, open your command prompt as admin and cd into the directory [EXAMPLE: 'cd C:/Users/yourName/Downloads/MangoAddons].  Then, run "pip install -r requirements.txt".  This will download all of the libraries needed to run the code
 
-Secondly, run the bot file with python within the repo, make sure to inject YOUR bot's token into the TOKEN constant on the last section of the bot
-
-Run the bot, and startup your favorite module! [note, if you need help with the bot, run "mango commands"]
+Secondly, launch your desired module by running "python3 <modName>", fill out the CLI [Start with buy/sell order, what item to flip, etc], the bot will then give you five seconds to navigate to your minecraft window, and will start executing the commands
