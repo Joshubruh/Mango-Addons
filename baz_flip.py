@@ -72,19 +72,29 @@ def get_action():
 
 #--------------- GLOBAL COMMANDS
 def read_chat(): # Grabs section of chat history and converts to text
-    chatGrabImg = ImageGrab.grab(bbox=(0,1140,950,1340))
+    chatGrabImg = ImageGrab.grab(bbox=(0,785,1080,1000))
     chatGrab = pytesseract.image_to_string(chatGrabImg)
     return chatGrab
 
 def determine_gui_open(called_from):
     img = ImageGrab.grab()
-    color = img.getpixel((1430, 420))
-    if color == (198, 198, 215):
+    color = img.getpixel((707, 553))
+    if color == (198, 198, 198):
+        print("YES")
         time.sleep(0.3)
         keyboard.press(Key.esc)
         time.sleep(0.1)
         keyboard.release(Key.esc)
-
+        
+        if called_from == "buy":
+            sell_offer_serum(True)
+        elif called_from == "sell":
+            create_buy_order_serum(True)
+            
+            
+    else:
+        print(":(")
+            
 def execute(arg, needsDelay):
     if needsDelay:
         time.sleep(10)
@@ -99,11 +109,12 @@ def reconnect(trigger):
     print("[LOG]: Disconnect Detected")
     os.system("espeak disconnect_detected")
     time.sleep(5)
-    pag.click(1275,790)
-    pag.moveTo(890,315)
+    pag.click(965, 605)
+    pag.moveTo(570, 315)
     time.sleep(0.3)
     pag.click()
-
+    if trigger != "recursive":
+        determine_connected("recursive")
     execute("/play skyblock", True)
     time.sleep(10)
 
@@ -117,7 +128,7 @@ def reconnect(trigger):
 
 
 def determine_connected(trigger):
-    chatGrabImg = ImageGrab.grab(bbox=(1112,768,1437,816))
+    chatGrabImg = ImageGrab.grab(bbox=(800,583,1095,620))
     chatGrab = pytesseract.image_to_string(chatGrabImg)
     if "Back" in chatGrab and "list" in chatGrab:
         reconnect(trigger)
@@ -141,6 +152,7 @@ def warpout_failsafe(called_from):
 
 
 def open_bazaar():
+    time.sleep(1)
     status = "bazaar"
     keyboard.press("/")
     time.sleep(0.1)
@@ -153,7 +165,7 @@ def open_bazaar():
     keyboard.press("z")
     time.sleep(0.1)
     keyboard.release("z")
-    time.sleep(0.1)
+    time.sleep(0.3)
     keyboard.press(Key.enter)
     keyboard.release(Key.enter)
 
@@ -166,7 +178,7 @@ def bz_wo_slash():
     keyboard.press("z")
     time.sleep(0.1)
     keyboard.release("z")
-    time.sleep(0.1)
+    time.sleep(0.3)
     keyboard.press(Key.enter)
     keyboard.release(Key.enter)
 
@@ -176,10 +188,10 @@ def claim_sell(slash):
     else:
         bz_wo_slash()
     time.sleep(1)
-    pag.moveTo(1335, 725, duration=0.1)
+    pag.moveTo(1010, 545, duration=0.1)
     pag.click()
     time.sleep(1)
-    pag.moveTo(1115, 575, duration=0.1)
+    pag.moveTo(795, 380, duration=0.1)
     pag.click()
     time.sleep(1)
     keyboard.press(Key.esc)
@@ -195,13 +207,13 @@ def cancel_sell(slash):
     else:
         bz_wo_slash()
     time.sleep(1)
-    pag.moveTo(1330, 730, duration=0.1)
+    pag.moveTo(1010, 545, duration=0.1)
     pag.click()
     time.sleep(1)
-    pag.moveTo(1115, 580, duration=0.1)
+    pag.moveTo(795, 380, duration=0.1)
     pag.click()
     time.sleep(1)
-    pag.moveTo(1280, 580, duration=0.1)
+    pag.moveTo(955, 385, duration=0.1)
     pag.click()
     time.sleep(1)
     keyboard.press(Key.esc)
@@ -216,14 +228,13 @@ def cancel_order(slash):
     else:
         bz_wo_slash()
     time.sleep(1)
-    time.sleep(1)
-    pag.moveTo(1330, 730, duration=0.1)
+    pag.moveTo(1010, 545, duration=0.1)
     pag.click()
     time.sleep(1)
-    pag.moveTo(1120, 620, duration=0.1)
+    pag.moveTo(800, 435, duration=0.1)
     pag.click()
     time.sleep(1)
-    pag.moveTo(1170, 565, duration=0.1)
+    pag.moveTo(840, 385, duration=0.1)
     pag.click()
     time.sleep(1)
 
@@ -290,10 +301,10 @@ def claim_order(slash):
     else:
         bz_wo_slash()
     time.sleep(0.5)
-    pag.moveTo(1335, 725, duration=0.1)
+    pag.moveTo(1010, 545, duration=0.1)
     pag.click()
-    time.sleep(0.2)
-    pag.moveTo(1120, 620, duration=0.1)
+    time.sleep(1)
+    pag.moveTo(790, 435, duration=0.1)
     pag.click()
     time.sleep(0.2)
     keyboard.press(Key.esc)
@@ -365,6 +376,7 @@ def handle_outdated_sell_kismet():
     sell_offer_kismets()
 #--------------- START OF MS1 SUB-MOD
 def sell_offer_ms1(firstexec):
+    determine_gui_open("sell")
     if firstexec == True:
         open_bazaar()
     else:
@@ -377,12 +389,14 @@ def sell_offer_ms1(firstexec):
     coordinates.click(coordinates.undercut_by_1)
     coordinates.click(coordinates.confirm_offer)
     keyboard.press("/")
+    time.sleep(0.2)
     keyboard.release("/")
     while True:
         detect_outdated_ms1_sell()
         time.sleep(1)
 
 def create_buy_order_ms1(firstexec):
+    determine_gui_open()
     log.start()
     if firstexec == False:
         bz_wo_slash()
@@ -458,12 +472,12 @@ def handle_outdated_ms1_sell():
 # Start Serum Module
 
 def sell_offer_serum(firstexec):
-    determine_gui_open("NULL")
+    determine_gui_open("sell")
     if firstexec == True:
         open_bazaar()
     else:
         bz_wo_slash()
-    time.sleep(0.3)
+    time.sleep(3)
     coordinates.click(coordinates.oddities_cat)
     coordinates.click(coordinates.modifiers_menu)
     coordinates.click(coordinates.serum)
@@ -477,7 +491,7 @@ def sell_offer_serum(firstexec):
         time.sleep(1)
 
 def create_buy_order_serum(firstexec):
-    determine_gui_open("NULL")
+    determine_gui_open("buy")
     log.start()
     if firstexec == False:
         bz_wo_slash()
@@ -514,7 +528,6 @@ def detect_outdated_ms1_sell():
 
 def detect_outdated_ms1_buy():
     if "MATCHED" in read_chat() or "OUT" in read_chat() or "ATED" in read_chat():
-        print("Outdated: Relisting Order")
         handle_outdated_ms1_buy()
     elif "filled" in read_chat():
         handle_filled_ms1_buy()
